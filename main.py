@@ -1,7 +1,9 @@
+import os
 from flask import Flask, request, send_file
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 
+app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 app = Flask(__name__)
 
 def generate_image(ip):

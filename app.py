@@ -16,10 +16,12 @@ def generate_image(ip):
 
 @app.route('/')
 def home():
-    # Try to get the visitor's real IP from the 'X-Forwarded-For' header
-    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    img_io = generate_image(ip)
+    x_forwarded_for = request.headers.get('X-Forwarded-For', request.remote_addr)
+    client_ip = x_forwarded_for.split(',')[0].strip()
+    
+    img_io = generate_image(client_ip)
     return send_file(img_io, mimetype='image/png', as_attachment=False)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)

@@ -3,7 +3,7 @@ from flask import Flask, request, send_file
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 
-app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+# Instantiate the Flask app
 app = Flask(__name__)
 
 def generate_image(ip):
@@ -30,5 +30,7 @@ def home():
     img_io = generate_image(ip)  # Generate an image from the IP address
     return send_file(img_io, mimetype='image/png', as_attachment=False)
 
+# Run the app only if this is the main module
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Set host and port for local development; these will be overridden by Gunicorn when deployed
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)

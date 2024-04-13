@@ -1,36 +1,25 @@
-import os
 from flask import Flask, request, send_file
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 
-# Instantiate the Flask app
 app = Flask(__name__)
 
 def generate_image(ip):
-    # Create an image with white background
-    img = Image.new('RGB', (200, 100), color = (255, 255, 255))
+    img = Image.new('RGB', (200, 100), color=(255, 255, 255))
     d = ImageDraw.Draw(img)
-    
-    # Load a font (standard PIL fonts or load from file)
     font = ImageFont.load_default()
-    
-    # Insert the IP address in the image
-    d.text((10,40), ip, fill=(0, 0, 0), font=font)
-    
-    # Save the image to a BytesIO object
+    d.text((10, 40), ip, fill=(0, 0, 0), font=font)
     img_io = BytesIO()
     img.save(img_io, 'PNG')
-    img_io.seek(0)  # Move to the beginning of the stream
-    
+    img_io.seek(0)
     return img_io
 
 @app.route('/')
 def home():
-    ip = request.remote_addr  # Get visitor's IP address
-    img_io = generate_image(ip)  # Generate an image from the IP address
+    # Try to get the visitor's real IP from the 'X-Forwarded-For' header
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    img_io = generate_image(ip)
     return send_file(img_io, mimetype='image/png', as_attachment=False)
 
-# Run the app only if this is the main module
 if __name__ == '__main__':
-    # Set host and port for local development; these will be overridden by Gunicorn when deployed
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
